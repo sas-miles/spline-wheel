@@ -26,8 +26,8 @@ function initSpline() {
   const canvas = document.getElementById('canvas3d');
   spline = new Application(canvas);
 
-  spline.load('https://prod.spline.design/wpgSG2JE-TDxdUTs/scene.splinecode').then(() => {
-    obj = spline.findObjectById('a59a2a4f-190a-4f64-bf68-0654b63efe6b');
+  spline.load('https://prod.spline.design/9Q71hsKhXQOshD2z/scene.splinecode').then(() => {
+    obj = spline.findObjectById('a35fc059-f3ce-40a2-828b-2f5a9265de31');
     setInitialState(); // Set initial state based on URL
   });
 }
