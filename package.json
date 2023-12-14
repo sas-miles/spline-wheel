@@ -54,7 +54,7 @@
   "dependencies": {
     "@barba/core": "^2.9.7",
     "@finsweet/ts-utils": "^0.40.0",
-    "@splinetool/runtime": "^0.9.519",
+    "@splinetool/runtime": "^0.9.522",
     "gsap": "^3.12.3"
   },
   "engines": {
