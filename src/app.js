@@ -8,25 +8,23 @@ let isToggled = false;
 
 function setInitialState() {
   console.log('Setting initial state', window.location.pathname, isToggled);
-  if (window.location.pathname === '/product') {
-    if (!isToggled) {
-      console.log('Toggling on');
-      isToggled = true;
-      spline.emitEvent('mouseDown', obj.name);
-    }
-  } else {
-    if (isToggled) {
-      console.log('Toggling off');
-      isToggled = false;
-      spline.emitEventReverse('mouseDown', obj.name);
-    }
+  const isProductPage = window.location.pathname.endsWith('/product'); // Adjust according to your URL structure
+
+  if (isProductPage && !isToggled) {
+    console.log('Toggling on');
+    isToggled = true;
+    spline.emitEvent('mouseDown', obj.name);
+  } else if (!isProductPage && isToggled) {
+    console.log('Toggling off');
+    isToggled = false;
+    spline.emitEventReverse('mouseDown', obj.name);
   }
 }
 
 function initSpline() {
   if (spline) {
     console.log('Spline is already initialized');
-    return; // Check if Spline is already initialized
+    return;
   }
 
   console.log('Initializing Spline');
@@ -40,7 +38,6 @@ function initSpline() {
   });
 }
 
-// Handle click events using event delegation
 function handleClick(event) {
   const { target } = event;
   console.log('Click event', target);
@@ -55,7 +52,6 @@ function handleClick(event) {
   }
 }
 
-// Attach event listener to a static parent element for delegation
 const staticParent = document.body;
 staticParent.addEventListener('click', handleClick);
 
@@ -69,7 +65,6 @@ function handleLinkClick(event) {
   }
 }
 
-// Call this function at the start of the transition
 function disableNavigation() {
   console.log('Disabling navigation');
   isTransitioning = true;
@@ -78,7 +73,6 @@ function disableNavigation() {
   });
 }
 
-// Call this function once the transition is complete
 function enableNavigation() {
   console.log('Enabling navigation');
   isTransitioning = false;
@@ -86,6 +80,13 @@ function enableNavigation() {
     link.removeEventListener('click', handleLinkClick);
   });
 }
+
+function handlePopState() {
+  console.log('Popstate event triggered');
+  barba.go(window.location.href);
+}
+
+window.addEventListener('popstate', handlePopState);
 
 barba.init({
   transitions: [
@@ -98,7 +99,6 @@ barba.init({
       },
       leave(data) {
         console.log('Transition leave', data);
-        // Fade out the current container
         return gsap.to(data.current.container, {
           opacity: 0,
           duration: 0.5,
@@ -108,18 +108,15 @@ barba.init({
         console.log('Transition enter', data);
         const nextContainer = data.next.container;
         nextContainer.classList.add('fixed');
-
-        // Initially set next container to invisible to prevent user from seeing a clickable element
         gsap.set(nextContainer, { opacity: 0 });
-
-        // Delay the start of the fade-in for the next container
         return gsap.to(nextContainer, {
           opacity: 1,
           duration: 0.5,
           ease: 'power1.out',
           onComplete: () => {
             nextContainer.classList.remove('fixed');
-            enableNavigation(); // Re-enable navigation after the transition
+            enableNavigation();
+            setInitialState();
           },
         });
       },
