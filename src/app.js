@@ -99,16 +99,34 @@ barba.init({
       },
       leave(data) {
         console.log('Transition leave', data);
-        return gsap.to(data.current.container, {
+
+        // Animate the .is-home-logo element to move up by 100px
+        const homeLogo = data.current.container.querySelector('.is-home-logo');
+        const logoAnimation = homeLogo
+          ? gsap.to(homeLogo, {
+              y: -100,
+              duration: 0.5,
+              ease: 'power1.out',
+            })
+          : Promise.resolve();
+
+        // Fade out the current container
+        const containerAnimation = gsap.to(data.current.container, {
           opacity: 0,
           duration: 0.5,
         });
+
+        // Wait for both animations to complete
+        return Promise.all([logoAnimation, containerAnimation]);
       },
+
       enter(data) {
         console.log('Transition enter', data);
         const nextContainer = data.next.container;
         nextContainer.classList.add('fixed');
         gsap.set(nextContainer, { opacity: 0 });
+
+        // Start the transition to the next container
         return gsap.to(nextContainer, {
           opacity: 1,
           duration: 0.5,
@@ -117,6 +135,16 @@ barba.init({
             nextContainer.classList.remove('fixed');
             enableNavigation();
             setInitialState();
+
+            // Animate the .is-product element
+            const productElement = nextContainer.querySelector('.is-product');
+            if (productElement) {
+              gsap.fromTo(
+                productElement,
+                { y: -100 }, // starting position
+                { y: 0, duration: 0.5, ease: 'power1.in' } // ending position and properties
+              );
+            }
           },
         });
       },
